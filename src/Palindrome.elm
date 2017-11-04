@@ -18,6 +18,7 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+module Palindrome exposing (main, palindrome)
 
 import Html exposing (Html, text, div, input)
 import Html.Events exposing (onInput)
@@ -29,6 +30,8 @@ type LatestWord = LatestWord String
 
 model : Model
 model = ""
+
+palindrome = reverse
 
 main : Program Never Model LatestWord
 main = Html.beginnerProgram {
@@ -46,4 +49,4 @@ view mod = div[] [
 
 update : LatestWord -> Model -> Model
 update ms mod = case ms of
-                  LatestWord s -> reverse s
+                  LatestWord s -> palindrome s
