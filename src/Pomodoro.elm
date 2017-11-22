@@ -1,13 +1,9 @@
 
 module Pomodoro exposing (main)
 
-import Html exposing (Html, text, div, ol, li, button, input, img)
-import List exposing (map, append, singleton)
-import Html.Attributes exposing (id, value, src, placeholder)
-import Html.Events exposing (onClick, onInput)
-import Tuple exposing (second, first)
-import Time
-import Debug exposing (log)
+import Html exposing (Html, Attribute, text, div, label, input, button, ol, li)
+import Html.Attributes exposing (id, for, style)
+import List exposing (map)
 
 type alias PomodoroLineItem =
    {taskName : String,
@@ -42,12 +38,31 @@ main = Html.program {
        }
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg mod = (mod, Cmd.none) 
+update msg mod = (mod, Cmd.none)
+
+
+-- Views
+
+globalFontStyle : Attribute Msg
+globalFontStyle = style [
+                    ("font-family", "sans-serif")
+                  ]
 
 view : Model -> Html Msg
-view mod = text("Hello World")
+view mod = div[id "outer", globalFontStyle] [
+             div [id "pomo-list"] [
+                text "List of Pomodoros",
+                ol [id "ordered-pomo-list"] 
+                     (map (\item -> li[][text item.taskName]) mod.pomodoroList)
+             ],
+             div [id "pomo-entry"] [
+                label[for "task-input"][text "Task Name:"],
+                input[id "task-input"][],
+                label[for "estimate-input"][text "Estimated:"],
+                input[id "estimate-input"][],
+                button[][text "Add"]
+             ]
+           ]
 
 subscriptions : Model -> Sub Msg
 subscriptions mod = (Sub.none)
-
-
