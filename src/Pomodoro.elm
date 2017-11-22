@@ -1,50 +1,53 @@
 
+module Pomodoro exposing (main)
+
 import Html exposing (Html, text, div, ol, li, button, input, img)
-import List exposing (map)
-import Html.Attributes exposing (id, value, src)
+import List exposing (map, append, singleton)
+import Html.Attributes exposing (id, value, src, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Tuple exposing (second, first)
+import Time
+import Debug exposing (log)
 
-type alias TextFieldString = String
-type alias ListOfTasks = List String
-type alias Model = (TextFieldString, ListOfTasks)
-type Action = AddTask | EnterTask String
+type alias PomodoroLineItem =
+   {taskName : String,
+    estimated : Int,
+    actual : Int, 
+    position: Int}
 
-model : Model
-model = ("", [])
+type alias PomodoroList = List PomodoroLineItem
 
-main : Program Never Model Action
-main = Html.beginnerProgram {
-          model = model,
+type alias Model =
+   {pomodoroList : PomodoroList,
+    pomodoroLineItem: PomodoroLineItem}
+
+type Msg = AddTask
+
+newPomodoroLineItem : PomodoroLineItem
+newPomodoroLineItem = PomodoroLineItem "New Task" 1 0 0
+
+initModel : Model
+initModel = {pomodoroList = [],
+             pomodoroLineItem = newPomodoroLineItem}
+
+init : (Model, Cmd msg)
+init = (initModel, Cmd.none)
+
+main : Program Never Model Msg
+main = Html.program {
+          init = init,
           view = view,
-          update = update
+          update = update,
+          subscriptions = subscriptions
        }
 
-viewTimer : Model -> Html Action
-viewTimer mod = div[(id "clock")][
-                     img [id "tomato-image", src "../images/tomato.png"] []
-                   ]
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg mod = (mod, Cmd.none) 
 
-view : Model -> Html Action
-view mod = let fieldData = first mod
-               taskList = second mod in
-                   div [id "outer-div"] [
-                      div [id "pomodoro-list"] [
-                         div [] [text "List of Items"],
-                         ol [] (map (\i -> li[][text i]) taskList),
-                         div [id "field-div"] [
-                           input [id "newTask", onInput EnterTask, value fieldData] [],
-                           button [onClick AddTask] [text "Click to Add"]
-                         ]
-                      ],
-                      div [id "pomodoro-timer"] [
-                         viewTimer mod
-                      ]
-                   ]
+view : Model -> Html Msg
+view mod = text("Hello World")
 
-update : Action -> Model -> Model
-update msg prevState = let fieldData = first prevState
-                           taskList = second prevState in
-                             case msg of
-                               EnterTask s -> (s, taskList)
-                               AddTask     -> ("", taskList ++ [fieldData])
+subscriptions : Model -> Sub Msg
+subscriptions mod = (Sub.none)
+
+

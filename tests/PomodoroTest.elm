@@ -1,4 +1,4 @@
-module Palindrome exposing (main, palindrome)
+module PomodoroTest exposing (all)
 
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
@@ -20,33 +20,23 @@ module Palindrome exposing (main, palindrome)
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Html exposing (Html, text, div, input)
-import Html.Events exposing (onInput)
-import String exposing (reverse)
 
-type alias Model = String
+import Palindrome exposing (palindrome)
+import Test exposing (Test, describe, test)
+import Expect
 
-type LatestWord = LatestWord String
-
-model : Model
-model = ""
-
-palindrome = reverse
-
-main : Program Never Model LatestWord
-main = Html.beginnerProgram {
-          model = model,
-          view = view,
-          update = update
-       }
-
-view : Model -> Html LatestWord
-view mod = div[] [
-               text "Enter word:",
-               input[onInput LatestWord][],
-               text mod
-            ]
-
-update : LatestWord -> Model -> Model
-update ms mod = case ms of
-                  LatestWord s -> palindrome s
+all:Test
+all = describe "Palindromes" [
+         test "An empty String should return an empty String" (\_ ->
+            Expect.equal (palindrome "") ""
+         ),
+         test "A String of one character should just return the same String" (\_ ->
+            Expect.equal (palindrome "a") "a"
+         ),
+         test "A String of foo, should be oof" (\_ ->
+            Expect.equal (palindrome "foo") "oof"
+         ),
+         test "A String of racecar, should be racecar" (\_ ->
+            Expect.equal (palindrome "racecar") "racecar"
+         )
+      ]

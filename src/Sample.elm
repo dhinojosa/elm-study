@@ -1,5 +1,3 @@
-module Palindrome exposing (main, palindrome)
-
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 --
@@ -20,33 +18,14 @@ module Palindrome exposing (main, palindrome)
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Html exposing (Html, text, div, input)
-import Html.Events exposing (onInput)
-import String exposing (reverse)
+module HelloWorld exposing (..)
 
-type alias Model = String
+import Html exposing (text)
 
-type LatestWord = LatestWord String
 
-model : Model
-model = ""
+add : Int -> Int -> Int
+add x y = x + y
 
-palindrome = reverse
-
-main : Program Never Model LatestWord
-main = Html.beginnerProgram {
-          model = model,
-          view = view,
-          update = update
-       }
-
-view : Model -> Html LatestWord
-view mod = div[] [
-               text "Enter word:",
-               input[onInput LatestWord][],
-               text mod
-            ]
-
-update : LatestWord -> Model -> Model
-update ms mod = case ms of
-                  LatestWord s -> palindrome s
+main = let g = (add <| 4 % 2) 
+                    <| 10 - 4 + 2 in
+                 text("Hello World " ++ toString(g))
