@@ -1,4 +1,4 @@
-module Pomodoro exposing (PomodoroLineItem, main, updateEstimateWithField, viewErrors)
+module Pomodoro exposing (PomodoroLineItem, main, updateEstimate, viewErrors)
 
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
@@ -55,7 +55,7 @@ type Msg
 
 newPomodoroLineItem : PomodoroLineItem
 newPomodoroLineItem =
-    PomodoroLineItem "New Task" 1 0 0
+    PomodoroLineItem "" 0 0 0
 
 
 initModel : Model
@@ -98,8 +98,8 @@ addTask mod =
     )
 
 
-updateInputTaskWithField : String -> String -> Model -> ( Model, Cmd Msg )
-updateInputTaskWithField fieldName value mod =
+updateInputTask : String -> String -> Model -> ( Model, Cmd Msg )
+updateInputTask fieldName value mod =
     let
         latest =
             mod.latest
@@ -113,8 +113,8 @@ updateInputTaskWithField fieldName value mod =
     ( updated, Cmd.none )
 
 
-updateEstimateWithField : String -> String -> Model -> ( Model, Cmd Msg )
-updateEstimateWithField fieldName value mod =
+updateEstimate : String -> String -> Model -> ( Model, Cmd Msg )
+updateEstimate fieldName value mod =
     let
         errors =
             mod.errors
@@ -124,7 +124,10 @@ updateEstimateWithField fieldName value mod =
 
         result =
             if Str.isEmpty value then
-                { mod | errors = Dict.empty }
+                { mod
+                    | errors = Dict.empty
+                    , latest = { latest | estimated = 0 }
+                }
             else
                 case Str.toInt value of
                     Ok i ->
@@ -135,10 +138,8 @@ updateEstimateWithField fieldName value mod =
 
                     Err s ->
                         { mod
-                            | errors =
-                                Dict.singleton
-                                    fieldName
-                                    [ s ]
+                            | errors = Dict.singleton fieldName [ s ]
+                            , latest = { latest | estimated = 0 }
                         }
     in
     ( result, Cmd.none )
@@ -148,13 +149,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg mod =
     case msg of
         InputTask fieldName value ->
-            updateInputTaskWithField fieldName value mod
+            updateInputTask fieldName value mod
 
         InputEstimate fieldName value ->
-            updateEstimateWithField fieldName value mod
+            updateEstimate fieldName value mod
 
         AddTask ->
             addTask mod
+
+
 
 -- Views
 
@@ -172,6 +175,11 @@ errorFontStyle =
         [ ( "color", "red" )
         ]
 
+
+type alias Rule = String -> Validation
+type alias Validation = { isReady : Bool
+                          ,errors  : Dict.Dict String (List String)
+                        }
 
 viewErrors : String -> Dict.Dict String (List String) -> Html Msg
 viewErrors idString dict =
@@ -199,18 +207,41 @@ viewField idString labelString model function =
         , viewErrors idString model.errors
         ]
 
+
+viewButton : Model -> Html Msg
+viewButton mod =
+    let
+        latest =
+            mod.latest
+
+        taskNameBlank =
+            latest.taskName |> String.isEmpty
+
+        estimatedZero =
+            latest.estimated |> (==) 0
+
+        isDisabled =
+            taskNameBlank || estimatedZero
+    in
+    button [ onClick AddTask, disabled isDisabled ] [ text "Add Task" ]
+        |> Debug.log "isDisabled"
+
+
 view : Model -> Html Msg
 view mod =
     div [ id "outer", globalFontStyle ]
         [ div [ id "pomo-list" ]
             [ text "List of Pomodoros"
             , ol [ id "ordered-pomo-list" ]
-                (Lst.map (\item -> li [] [ text <| item.taskName ++ " " ++ toString item.estimated ]) mod.list)
+                (Lst.map (\item -> li [] [ 
+                   text 
+                   <| item.taskName ++ " " ++ toString 
+                   item.estimated ]) mod.list)
             ]
         , div [ id "pomo-entry" ]
             [ viewField "task-input" "Task Name:" mod InputTask
             , viewField "task-estimate" "Estimated:" mod InputEstimate
-            , button [ onClick AddTask, disabled << not << Dict.isEmpty <| mod.errors ] [ text "Add Task" ]
+            , viewButton mod
             ]
         ]
 

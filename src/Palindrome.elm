@@ -31,7 +31,8 @@ type LatestWord = LatestWord String
 model : Model
 model = ""
 
-palindrome = reverse
+palindrome : String -> String
+palindrome s = reverse s
 
 main : Program Never Model LatestWord
 main = Html.beginnerProgram {
