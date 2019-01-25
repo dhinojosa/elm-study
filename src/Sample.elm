@@ -1,3 +1,5 @@
+module HelloWorld exposing (..)
+
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 --
@@ -18,14 +20,12 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module HelloWorld exposing (..)
-
 import Html exposing (text)
 
 
 add : Int -> Int -> Int
 add x y = x + y
 
-main = let g = (add <| 4 % 2) 
-                    <| 10 - 4 + 2 in
-                 text("Hello World " ++ toString(g))
+main =
+   let g = (add (modBy 4 2) (10 - 4 + 2)) in
+                 text("Hello World " ++ (String.fromInt <| g))

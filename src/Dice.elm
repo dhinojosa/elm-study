@@ -18,27 +18,42 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Random as Rnd
+
+module Dice exposing (main)
+
 import Html exposing (Html, text)
+import Browser exposing (element)
+import String exposing (fromInt)
 
-main : Program Never Model msg
-main = Html.program {
-         init = init,
-         update = update,
-         subscriptions = subscriptions,
-         view = view
-       }
+main : Program () Model msg
+main =
+    element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
-type Model = Roll {pip:Int}
 
-init : (Model, Cmd msg)
-init = (Roll 1, Cmd.none)
+type alias Model
+    = { pip : Int }
 
-update : msg -> Model -> (Model, Cmd msg)
-update mg md = (md, Cmd.none)
+
+init : flags -> ( Model, Cmd msg )
+init fg =
+    ( Model 1 , Cmd.none )
+
+
+update : msg -> Model -> ( Model, Cmd msg )
+update mg md =
+    ( md, Cmd.none )
+
 
 view : Model -> Html msg
-view m = text ("Current Pip:" ++ (toString << pip <| m))
+view m =
+    text <| "Current Pip:" ++ (fromInt <| m.pip)
+
 
 subscriptions : Model -> Sub msg
-subscriptions = always Sub.none
+subscriptions =
+    always Sub.none

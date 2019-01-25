@@ -1,3 +1,5 @@
+module Weather exposing (constructURL, main)
+
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 --
@@ -18,42 +20,50 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module Weather exposing (constructURL, main)
-
-import Debug exposing (log)
+import Browser
 import Html exposing (Html, br, button, div, input, text)
 import Html.Attributes exposing (id, placeholder)
 import Html.Events exposing (onClick, onInput)
-import Http exposing (Error, send)
-import Json.Decode as Decode exposing (Decoder, at, decodeString, map2)
-import Regex exposing (HowMany(All), regex, replace)
+import Http exposing (Error(..))
+import Json.Decode as Decode exposing (Decoder, at, map2)
+import Maybe
+import Regex exposing (fromString, replace)
 import String
-import Time
+import Url.Builder exposing (crossOrigin)
 
+--completeString : String
+--completeString = """https://gist.githubusercontent.com/dhinojosa/877425fb98a939a816e2c56f02bbedd0/raw/84158bf19d58dca011cecf267eae0307232b76f3/countries.json"""
+--
+--completeURL : String
+--completeURL = crossOrigin
+--                 "https://gist.githubusercontent.com"
+--                 ["dhinojosa"
+--                 ,"877425fb98a939a816e2c56f02bbedd0"
+--                 ,"ram"
+--                 ,"84158bf19d58dca011cecf267eae0307232b76f3"
+--                 ,"countries.json"]
+--                 []
 
 type alias Model =
     { cityState : String
     , condition : Condition
     , error : String
-    , time: Float}
-
+    }
 
 type alias Condition =
     { description : String
     , temperature : Maybe Int
     }
 
-
 type Msg
     = OnClick
     | OnInput String
     | NewRequest (Result Error Condition)
-    | Tick Time.Time
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { init = init
         , view = view
         , update = update
@@ -61,9 +71,17 @@ main =
         }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( { cityState = "", condition = { description = "", temperature = Nothing }, error = "", time = 0.0 }, Cmd.none )
+init : flags -> ( Model, Cmd Msg )
+init _ =
+    Tuple.pair
+        { cityState = ""
+        , condition =
+            { description = ""
+            , temperature = Nothing
+            }
+        , error = ""
+        }
+        Cmd.none
 
 
 baseQuery : String
@@ -78,7 +96,14 @@ baseUrl =
 
 constructURL : String -> String
 constructURL cityState =
-    replace All (regex "%fill-city%") (\_ -> cityState) baseQuery
+    let
+        maybe =
+            fromString "%fill-city%"
+
+        regex =
+            Maybe.withDefault Regex.never maybe
+    in
+    replace regex (\_ -> cityState) baseQuery
 
 
 suffixURL : String
@@ -86,11 +111,16 @@ suffixURL =
     "&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
 
 
+completeURL : String -> String
+completeURL cityState =
+    String.concat [ baseUrl, constructURL cityState, suffixURL ]
+
+
 viewTemp : Model -> Html Msg
 viewTemp mod =
     case mod.condition.temperature of
         Just n ->
-            text (toString n ++ "°F")
+            text (String.fromInt n ++ "°F")
 
         Nothing ->
             text ""
@@ -110,14 +140,12 @@ view mod =
             ]
         , div [ id "error-panel" ]
             [ text << .error <| mod ]
-        , div [ id "time-panel" ]
-            [ text << toString << .time  <| mod ]
         ]
 
 
 stringToMaybeIntDecoder : Decoder (Maybe Int)
 stringToMaybeIntDecoder =
-    Decode.map (Result.toMaybe << String.toInt) Decode.string
+    Decode.map String.toInt Decode.string
 
 
 decodeCondition : Decoder Condition
@@ -136,22 +164,31 @@ update msg mod =
 
         OnClick ->
             ( mod
-            , Http.send NewRequest
-                (Http.get
-                    (String.concat [ baseUrl, constructURL mod.cityState, suffixURL ])
-                    decodeCondition
-                )
+            , Http.get
+                { url = completeURL <| mod.cityState
+                , expect = Http.expectJson NewRequest decodeCondition
+                }
             )
 
         NewRequest (Ok cond) ->
             ( { mod | condition = cond }, Cmd.none )
 
-        NewRequest (Err e) ->
-            ( { mod | error = toString e }, Cmd.none )
+        NewRequest (Err (BadUrl s)) ->
+            ( { mod | error = s }, Cmd.none )
 
-        Tick t ->
-            ( { mod | time = t }, Cmd.none )
+        NewRequest (Err Timeout) ->
+            ( { mod | error = "Timeout" }, Cmd.none )
+
+        NewRequest (Err NetworkError) ->
+            ( { mod | error = "Network Error" }, Cmd.none )
+
+        NewRequest (Err (BadStatus s)) ->
+            ( { mod | error = "Bad Status" ++ (String.fromInt s) }, Cmd.none )
+
+        NewRequest (Err (BadBody s)) ->
+            ( { mod | error = "Bad Body: " ++ s }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions mod =
-    Time.every Time.second Tick
+    Sub.none

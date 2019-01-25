@@ -1,10 +1,11 @@
-module DestructuringTest exposing (suite)
+module DestructuringTest exposing (..)
 
 import Expect exposing (..)
 import Test exposing (..)
+import String exposing (fromChar, fromInt, fromFloat)
 
 myfunction : (Int, String) -> String
-myfunction (i, s) = s ++ (toString i)
+myfunction (i, s) = s ++ (fromInt i)
 
 suite : Test
 suite =
@@ -12,12 +13,12 @@ suite =
         [ test "Pattern Matching a List" <|
             \_ ->
                let 
-                   a = [1,2,3,4]
-                   r = case a of
+                   xs = [1,2,3,4]
+                   r = case xs of
                       [] -> "Empty"
-                      a :: [] -> "Single: " ++ (toString a)
-                      a :: b :: [] -> "Dual: " ++ (toString <| a + b)
-                      a :: b :: _ -> "Has at least two: " ++ (toString <| a + b)
+                      a :: [] -> "Single: " ++ (fromInt a)
+                      a :: b :: [] -> "Dual: " ++ (fromInt <| a + b)
+                      a :: b :: _ -> "Has at least two: " ++ (fromInt <| a + b)
                in 
                   Expect.equal r "Has at least two: 3"
           , test "Destructuring a Tuple" <|
@@ -25,9 +26,9 @@ suite =
                let
                    t = ("A", 4.0, (3, 'a'))
                    (s, d, (i , c)) = t
-                   r = s ++ (toString c) ++ (toString d) ++ (toString i)
+                   r = s ++ (fromChar c) ++ (fromFloat d) ++ (fromInt i)
                in
-                  Expect.equal r "A'a'43"
+                  Expect.equal r "Aa43"
           , test "Destructuring a Tuple in a function" <|
             \_ ->
                let
@@ -39,7 +40,7 @@ suite =
                let
                    t = ("A", 3, 4.0)
                    r = case t of
-                      (s, i, d) -> s ++ (toString <| i + d)
+                      (s, i, d) -> s ++ (fromFloat <| i + d)
                in
                   Expect.equal r "A7"
           , test "Pattern Matching a Record" <|
@@ -59,7 +60,7 @@ suite =
                                location = "King's Landing",
                                age = 19 }
                    {name, age} = joffrey
-                   r = name ++ " is " ++ (toString age)
+                   r = name ++ " is " ++ (fromInt age)
                in 
                   Expect.equal r "Joffrey Baratheon is 19"
         ]

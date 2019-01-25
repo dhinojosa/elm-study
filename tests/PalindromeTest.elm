@@ -1,4 +1,4 @@
-module PalindromeTest exposing (all)
+module PalindromeTest exposing (..)
 
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>

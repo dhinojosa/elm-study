@@ -20,12 +20,13 @@ module Pomodoro exposing (PomodoroLineItem, main, updateEstimate, viewErrors)
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import Browser exposing (element)
 import Dict
 import Html exposing (Attribute, Html, button, div, input, label, li, ol, text)
 import Html.Attributes exposing (disabled, for, id, style)
 import Html.Events exposing (onClick, onInput)
 import List as Lst
-import String as Str
+import String as Str exposing (fromInt)
 
 
 type alias PomodoroLineItem =
@@ -66,14 +67,14 @@ initModel =
     }
 
 
-init : ( Model, Cmd msg )
-init =
+init : () -> ( Model, Cmd msg )
+init _ =
     ( initModel, Cmd.none )
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    element
         { init = init
         , view = view
         , update = update
@@ -84,9 +85,6 @@ main =
 addTask : Model -> ( Model, Cmd Msg )
 addTask mod =
     let
-        previousList =
-            mod.list
-
         latest =
             mod.latest
     in
@@ -99,7 +97,7 @@ addTask mod =
 
 
 updateInputTask : String -> String -> Model -> ( Model, Cmd Msg )
-updateInputTask fieldName value mod =
+updateInputTask _ value mod =
     let
         latest =
             mod.latest
@@ -116,9 +114,6 @@ updateInputTask fieldName value mod =
 updateEstimate : String -> String -> Model -> ( Model, Cmd Msg )
 updateEstimate fieldName value mod =
     let
-        errors =
-            mod.errors
-
         latest =
             mod.latest
 
@@ -128,17 +123,21 @@ updateEstimate fieldName value mod =
                     | errors = Dict.empty
                     , latest = { latest | estimated = 0 }
                 }
+
             else
                 case Str.toInt value of
-                    Ok i ->
+                    Just i ->
                         { mod
                             | latest = { latest | estimated = i }
                             , errors = Dict.empty
                         }
 
-                    Err s ->
+                    Nothing ->
                         { mod
-                            | errors = Dict.singleton fieldName [ s ]
+                            | errors =
+                                Dict.singleton
+                                    fieldName
+                                    [ "Not a number" ]
                             , latest = { latest | estimated = 0 }
                         }
     in
@@ -164,22 +163,23 @@ update msg mod =
 
 globalFontStyle : Attribute Msg
 globalFontStyle =
-    style
-        [ ( "font-family", "sans-serif" )
-        ]
+    style "font-family" "sans-serif"
 
 
 errorFontStyle : Attribute Msg
 errorFontStyle =
-    style
-        [ ( "color", "red" )
-        ]
+    style "color" "red"
 
 
-type alias Rule = String -> Validation
-type alias Validation = { isReady : Bool
-                          ,errors  : Dict.Dict String (List String)
-                        }
+type alias Rule =
+    String -> Validation
+
+
+type alias Validation =
+    { isReady : Bool
+    , errors : Dict.Dict String (List String)
+    }
+
 
 viewErrors : String -> Dict.Dict String (List String) -> Html Msg
 viewErrors idString dict =
@@ -233,10 +233,18 @@ view mod =
         [ div [ id "pomo-list" ]
             [ text "List of Pomodoros"
             , ol [ id "ordered-pomo-list" ]
-                (Lst.map (\item -> li [] [ 
-                   text 
-                   <| item.taskName ++ " " ++ toString 
-                   item.estimated ]) mod.list)
+                (Lst.map
+                    (\item ->
+                        li []
+                            [ text <|
+                                item.taskName
+                                    ++ " "
+                                    ++ fromInt
+                                        item.estimated
+                            ]
+                    )
+                    mod.list
+                )
             ]
         , div [ id "pomo-entry" ]
             [ viewField "task-input" "Task Name:" mod InputTask
@@ -247,5 +255,5 @@ view mod =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions mod =
+subscriptions _ =
     Sub.none

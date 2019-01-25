@@ -20,34 +20,50 @@ module Palindrome exposing (main, palindrome)
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Html exposing (Html, text, div, input)
+import Browser exposing (sandbox)
+import Html exposing (Html, div, input, text)
 import Html.Events exposing (onInput)
 import String exposing (reverse)
 
-type alias Model = String
 
-type LatestWord = LatestWord String
+type alias Model =
+    String
+
+
+type LatestWord
+    = LatestWord String
+
 
 model : Model
-model = ""
+model =
+    ""
+
 
 palindrome : String -> String
-palindrome s = reverse s
+palindrome s =
+    reverse s
 
-main : Program Never Model LatestWord
-main = Html.beginnerProgram {
-          model = model,
-          view = view,
-          update = update
-       }
+
+main : Program () Model LatestWord
+main =
+    sandbox
+        { init = model
+        , view = view
+        , update = update
+        }
+
 
 view : Model -> Html LatestWord
-view mod = div[] [
-               text "Enter word:",
-               input[onInput LatestWord][],
-               text mod
-            ]
+view mod =
+    div []
+        [ text "Enter word:"
+        , input [ onInput LatestWord ] []
+        , text mod
+        ]
+
 
 update : LatestWord -> Model -> Model
-update ms mod = case ms of
-                  LatestWord s -> palindrome s
+update ms mod =
+    case ms of
+        LatestWord s ->
+            palindrome s

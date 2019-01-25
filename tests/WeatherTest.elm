@@ -1,10 +1,10 @@
-module WeatherTest exposing (suite)
+module WeatherTest exposing (..)
 
 import Expect exposing (..)
 import Test exposing (..)
 import Weather exposing (constructURL)
 import Json.Decode exposing (..)
-import Result exposing (Result (Ok, Err))
+import Result exposing (Result (..))
 
 
 sampleResult : String

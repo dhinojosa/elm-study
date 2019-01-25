@@ -22,13 +22,11 @@ module PomodoroTest exposing (all)
 
 import Dict
 import Expect
-import Html
-import Html.Attributes exposing (class)
 import Maybe
 import Pomodoro exposing (updateEstimate, viewErrors)
 import Test exposing (Test, describe, test)
 import Test.Html.Query as Query
-import Test.Html.Selector exposing (id, tag, text)
+import Test.Html.Selector exposing (tag)
 import Tuple
 
 
