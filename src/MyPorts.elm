@@ -1,12 +1,13 @@
 port module MyPorts exposing (..)
 
-import Html exposing (Html, button, div, input, program, text)
+import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (id)
 import Html.Events exposing (onClick, onInput)
+import Browser exposing (element)
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    element
         { init = init
         , view = view
         , update = update
@@ -27,9 +28,7 @@ type Msg
 
 
 subscriptions : Model -> Sub Msg
-subscriptions mod =
-    fromJs Answer
-
+subscriptions _ = fromJs Answer
 
 view : Model -> Html Msg
 view mod =
@@ -58,12 +57,11 @@ update msg mod =
             ( { mod | answer = s }, Cmd.none )
 
 
-init : ( Model, Cmd Msg )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( Model "" "", Cmd.none )
 
 
 port toJs : String -> Cmd msg
-
 
 port fromJs : (String -> msg) -> Sub msg
