@@ -1,5 +1,3 @@
-module Palindrome exposing (main, palindrome)
-
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 --
@@ -19,6 +17,8 @@ module Palindrome exposing (main, palindrome)
 -- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module Palindrome exposing (main, palindrome)
 
 import Browser exposing (sandbox)
 import Html exposing (Html, div, input, text)

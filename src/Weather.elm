@@ -30,6 +30,7 @@ import Maybe
 import Regex exposing (fromString, replace)
 import String
 import Url.Builder exposing (crossOrigin)
+import Debug exposing (log)
 
 --completeString : String
 --completeString = """https://gist.githubusercontent.com/dhinojosa/877425fb98a939a816e2c56f02bbedd0/raw/84158bf19d58dca011cecf267eae0307232b76f3/countries.json"""
@@ -163,12 +164,15 @@ update msg mod =
             ( { mod | cityState = s }, Cmd.none )
 
         OnClick ->
-            ( mod
-            , Http.get
-                { url = completeURL <| mod.cityState
-                , expect = Http.expectJson NewRequest decodeCondition
-                }
-            )
+            let
+                u = completeURL <| mod.cityState in
+                  Debug.log u <|
+                  ( mod
+                   , Http.get
+                       { url = completeURL <| mod.cityState
+                       , expect = Http.expectJson NewRequest decodeCondition
+                       }
+                   )
 
         NewRequest (Ok cond) ->
             ( { mod | condition = cond }, Cmd.none )

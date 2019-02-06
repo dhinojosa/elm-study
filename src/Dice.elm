@@ -40,12 +40,12 @@ type alias Model
 
 
 init : flags -> ( Model, Cmd msg )
-init fg =
+init _ =
     ( Model 1 , Cmd.none )
 
 
 update : msg -> Model -> ( Model, Cmd msg )
-update mg md =
+update _ md =
     ( md, Cmd.none )
 
 

@@ -1,5 +1,3 @@
-module Pomodoro exposing (PomodoroLineItem, main, updateEstimate, viewErrors)
-
 -- Copyright (c) 2017 Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 -- Author: Hinojosa, Daniel <dhinojosa@evolutionnext.com>
 --
@@ -19,6 +17,8 @@ module Pomodoro exposing (PomodoroLineItem, main, updateEstimate, viewErrors)
 -- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module Pomodoro exposing (PomodoroLineItem, main, updateEstimate, viewErrors)
 
 import Browser exposing (element)
 import Dict
@@ -224,7 +224,6 @@ viewButton mod =
             taskNameBlank || estimatedZero
     in
     button [ onClick AddTask, disabled isDisabled ] [ text "Add Task" ]
-        |> Debug.log "isDisabled"
 
 
 view : Model -> Html Msg
